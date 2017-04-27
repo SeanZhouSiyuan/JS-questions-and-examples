@@ -8,4 +8,4 @@ A common mistake when dealing with JS closures and its solutions. Contents in Ch
 
 ### iszu-js-practice.md
 
-Examples from [iszu/web-learning](https://github.com/SeanZhouSiyuan/JavaScript-examples) page. Solutions offered by *SeanZhouSiyuan*. Contents in Chinese.
+Examples from [iszu/web-learning](https://github.com/iszu/web-learning) page. Solutions offered by *SeanZhouSiyuan*. Contents in Chinese.
