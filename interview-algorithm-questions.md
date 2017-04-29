@@ -212,6 +212,138 @@
 
 ## Strings
 
+1. Given a string, reverse a given sentence:
+
+   ```javascript
+   var str = 'Welcome to this JavaScript Guide!';
+   var reverseSentence = reverseBySeparator(str, '');
+   var reverseWord = reverseBySeparator(str, ' ');
+   ```
+
+   **Solution:**
+
+   ```javascript
+   function reverseBySeparator(str, sep) {
+     return str.split(sep).reverse().join(sep);
+     // toString() cannot be used because it will add commas
+   }
+   ```
+
+2. Given two strings, return `true` if they are anagrams of one another:
+
+   ```javascript
+   var first = 'Mary';
+   var second = 'Army';
+
+   isAnagram(first, second); // true
+   ```
+
+   **Solution:**
+
+   ```javascript
+   function isAnagram(first, second) {
+     // Check if the parameters are strings
+     if(typeof first !== 'string' || typeof second !== 'string') return -1;
+     // Check if the strings have same length
+     if(first.length !== second.length) return false;
+     // Change both strings to lower case, convert them to arrays to sort them, and convert back to strings to compare the result
+     var firstStr = first.toLowerCase().split('').sort().join('');
+     var secondStr = second.toLowerCase().split('').sort().join('');
+     return firstStr === secondStr;
+   }
+   ```
+
+3. Check if a given string is isomorphic:
+
+   ```javascript
+   isIsomorphic('egg', 'add'); // true
+   isIsomorphic('paper', 'title'); // true
+   isIsomorphic('kick', 'side'); // true
+   ```
+
+   **Solution:**
+
+   ```javascript
+   function isIsomorphic(str1, str2) {
+     // If either of two parameters is not string, return -1
+     if(typeof str1 !== 'string' || typeof str2 !== 'string') return -1;
+     // If the two strings have different length, return false
+     if(str1.length !== str2.length) return false;
+     var letterMap = {};
+     for(let i = 0; i < str1; i++) {
+       if(letterMap[str1[i]] === undefined) {
+         letterMap[str1[i]] = str2[i];
+       }
+       else if(letterMap[str1[i]] !== letterMap[str2[i]]) {
+         // If a letter exists in letterMap, but does not map to the corresponding letter from the second string, return false
+         return false;
+       }
+     }
+     return true;
+   }
+   ```
+
+
+## Stacks and Queues
+
+1. Implement enqueue and dequeue using only two stacks:
+
+   **Solution:**
+
+   ```javascript
+   var inputStack = [];
+   var outputStack = [];
+
+   // For enqueue, use push()
+   function enqueue(inputStack, e) {
+     inputStack.push(e);
+   }
+   // For dequeue, use shift()
+   function dequeue(outputStack) {
+     return outputStack.shift();
+   }
+   ```
+
+2. Create a function that will evaluate if a given expression has balanced parentheses - using stacks:
+
+   ```javascript
+   var exp1 = '{{}}{}{}';
+   var exp2 = '{}{{}';
+
+   isBalanced(exp1); // true
+   isBalanced(exp2); // false
+   isBalanced(''); // true
+   ```
+
+   **Solution:**
+
+   ```javascript
+   function isBalanced(str) {
+     let stack = [];
+     // Traverse the string expression:
+     // * if the current character is an opening bracket, push it to stack
+     // * if the current character is a closing bracket, check if the top character in stack matches it. If so then fine, if close return false
+     // * else continue
+     for(let ch of str) {
+       if(ch === '{' || ch === '(' || ch === '[') {
+         stack.push(ch);
+       } else if(ch === '}') {
+         if(stack[stack.length - 1] === '{') stack.pop();
+         else return false;
+       } else if(ch === ')') {
+         if(stack[stack.length - 1] === '(') stack.pop();
+         else return false;
+       } else if(ch === ']') {
+         if(stack[stack.length - 1] === '[') stack.pop();
+         else return false;
+       }
+     }
+     // If the array is not empty, it is not balanced (there are extra opening bracket)
+     return stack.length === 0;
+   }
+   ```
+
+
 ## The MIT License (MIT)
 
 Copyright (c) 2016 Kenny Chan
