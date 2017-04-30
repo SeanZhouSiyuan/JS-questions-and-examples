@@ -344,6 +344,48 @@
    ```
 
 
+## Recursion
+
+1. Write a recursion function that returns the binary string of a given decimal number:
+
+   ```javascript
+   decimalToBinary(3); // 11
+   decimalToBinary(8); // 1000
+   decimalToBinary(1000); // 1111101000
+   ```
+
+   **Solution:**
+
+   ```javascript
+   // Use the built toString() method
+   function decimalToBinary(n) {
+     return (n).toString(2);
+   }
+   // non-recursion method
+   function decimalToBinary(n) {
+     var stack = [];
+     while(n) {
+       stack.push(n % 2);
+       n = Math.floor(n / 2);
+     }
+     return stack.reverse().join('');
+   }
+   // Recursion method
+   function decimalToBinary(n) {
+     if(n >= 1) {
+       if(n % 2 === 0) {
+         return decimalToBinary(n / 2) + 0;
+       } else {
+         return decimalToBinary((n - 1) / 2) + 1;
+       }
+     } else {
+       // Exit condition
+       return '';
+     }
+   }
+   ```
+
+
 ## The MIT License (MIT)
 
 Copyright (c) 2016 Kenny Chan
