@@ -1,6 +1,6 @@
-## JavaScript Examples
+## JavaScript Questions and Examples
 
-This folder contains JavaScript examples ranging from dates, arrays, to strings, functions and closures.
+This folder contains an array of JavaScript questions and examples, ranging from dates, arrays, to strings, functions and closures.
 
 ### closure-fix.md
 
