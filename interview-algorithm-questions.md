@@ -386,6 +386,39 @@
    ```
 
 
+## Numbers
+
+1. Given an integer, determine if it is a power of 2. If so, return `true`, else return `false`:
+
+   ```javascript
+   isPowerOfTwo(4); // true
+   isPowerOfTwo(1); // true
+   isPowerOfTwo(0); // false
+   ```
+
+   **Solution:**
+
+   ```javascript
+   function isPowerOfTwo(n) {
+     // Check if n is integer
+     if(!Number.isInteger(n) || n <= 0) return false;
+     for(let i = 0; ; i++) {
+       // If 2 ** i is already larger than n, return false
+       if(2 ** i > Number.MAX_SAFE_INTEGER || 2 ** i > n) return false;
+       if(2 ** i === n) return true;
+     }
+   }
+   // Better solution
+   function isPowerOfTwo(n) {
+     // Check if n is integer
+     if(!Number.isInteger(n) || n <= 0) return false;
+     // If log2(n) is integer, return true
+     else if(Number.isInteger(Math.log2(n))) return true;
+     else return false;
+   }
+   ```
+
+
 ## The MIT License (MIT)
 
 Copyright (c) 2016 Kenny Chan
