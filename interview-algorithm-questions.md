@@ -419,6 +419,57 @@
    ```
 
 
+## Javascript
+
+1. Explain what is hoisting in Javascript:
+
+   Hoisting is the concept in which Javascript, by default, moves all declarations to the top of the current scope. As such, a variable can be used before it has been declared. Note that Javascript only hoists declarations and not initializations.
+
+2. Describe the functionality of the `use strict;` directive:
+
+   the `use strict` directive defines that the Javascript should be executed in `strict mode`. One major benefit that strict mode provides is that it prevents developers from using undeclared variables. Older versions of javascript would ignore this directive declaration.
+
+   ```javascript
+   // Example of strict mode
+   "use strict";
+
+   catchThemAll();
+   function catchThemAll() {
+     x = 3.14; // Error will be thrown
+     return x * x;
+   }
+   ```
+
+3. Explain "event bubbling" and how one may prevent it:
+
+   Event bubbling is the concept in which an event triggers at the deepest possible element, and triggers on parent elements in nesting order. As a result, when clicking on a child element one may exhibit the handler of the parent activating.
+
+   One way to prevent event bubbling is using "event.stopPropagation()" or "event.cancelBubble" on IE < 9.
+
+4. What is the difference between `==` and `===` in JS?
+
+   `===` is known as a strict operator. The key difference between `==` and `===` is that the strict operator matches for both value and type, as opposed to just the value.
+
+   ```javascript
+   // Example of comparators
+   0 == false; // true
+   0 === false; // false
+
+   2 == '2'; // true
+   2 === '2'; // false
+   ```
+
+
+5. What is the difference between `null` and `undefined`?
+
+   In Javascript, null is an assignment value, and can be assigned to a variable representing that it has no value. Undefined, on the other hand, represents that a variable has been declared but there is no value associated with it.
+
+
+6. How does prototypal inheritance differ from classical inheritance?
+
+   In classical inheritance, classes are immutable, may or may not support multiple inheritance, and may contain interfaces, final classes, and abstract classes. In contrast, prototypes are much more flexible in the sense that they may be mutable or immutable. The object may inherit from multiple prototypes, and only contains objects.
+
+
 ## The MIT License (MIT)
 
 Copyright (c) 2016 Kenny Chan
