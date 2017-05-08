@@ -14,13 +14,12 @@
    ```javascript
    function computeProduct(unsorted) {
      // Sort the array ascending
-     var arr = unsorted.sort(function(a, b){return a - b;});
+     var arr = unsorted.sort((a, b) => a - b);
      // Get two possible largest products
      var product1 = arr[0] * arr[1] * arr[arr.length - 1];
      var product2 = arr[arr.length - 1] * arr[arr.length - 2] * arr[arr.length - 3];
      // Do the comparison
-     if(product1 >= product2) {return product1;}
-     else {return product2;}
+     return product1 >= product2 ? product1 : product2;
    }
    ```
 
@@ -66,14 +65,16 @@
 
    ```javascript
    // ES6 implementation
-   Array.from(new Set(arr)); // [1, 2, 3, 5, 9, 8]
+   // A set object stores unique values of any type.
+   [...new Set(arr)]; // [1, 2, 3, 5, 9, 8]
+   // Or Array.from(new Set(arr));
 
    // ES5 implementation
    function uniqueArray(arr) {
      for(let i = 0; i < arr.length; i++) {
        let lastPos = arr.lastIndexOf(arr[i]);
        // if the current value is not unique, remove its last occurrence
-       if(i != lastPos) {
+       if(i !== lastPos) {
          arr.splice(lastPos, 1);
          // To check again whether the current value is unique
          i--;
@@ -83,7 +84,7 @@
    }
 
    // Alternative ES5 implementation
-   function uniqueArrayAtl(arr) {
+   function uniqueArrayAlt(arr) {
      var hashmap = {};
      var unique = [];
      for(let value of arr) {
@@ -156,9 +157,7 @@
      for(let i = 0; i < arr.length; i++) {
        let array = arr.slice();
        array.splice(i, 1);
-       product[i] = array.reduce(function(initial, value) {
-         return initial * value;
-       }, 1);
+       product[i] = array.reduce((initial, current) => initial * current, 1);
      }
      return product;
    }
@@ -383,6 +382,12 @@
        return '';
      }
    }
+   ```
+
+2. Write a recursive function that performs a binary search:
+
+   ```javascript
+
    ```
 
 
