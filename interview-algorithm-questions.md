@@ -424,6 +424,29 @@
    ```
 
 
+## Sort
+
+1. Insertion sort:
+
+   ```javascript
+   function insertionSort(arr) {
+     for(let i = 1; i < arr.length; i++) {
+       // Find an item smaller than the previous item
+       if(arr[i] < arr[i-1]) {
+         // Store the item to be moved
+         let e = arr[i];
+         let j = i - 1;
+         // Find the position where the item will be stored
+         while(arr[j] >= e) j--;
+         arr.copyWithin(j + 2, j + 1, i);
+         arr[j + 1] = e;
+       }
+     }
+     return arr;
+   }
+   ```
+
+
 ## Javascript
 
 1. Explain what is hoisting in Javascript:
