@@ -446,6 +446,53 @@
    }
    ```
 
+2. Bubble sort:
+
+   ```javascript
+   function bubbleSort(arr) {
+     // iterate (arr.length - 1) times
+     for(let i = 0; i < arr.length - 1; i++) {
+       // For each iteration, compare every adjacent pair,
+       // swap their position if they are not in right order
+       for(let j = 0; j < arr.length - 1 - i; j++) {
+         if(arr[j] > arr[j + 1])
+           // use ES6 syntax
+           [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+       }
+     }
+     return arr;
+   }
+   ```
+
+3. Quick sort:
+
+   ```javascript
+   function partition(arr, low, high) {
+     var pivotKey = arr[low];
+     while(low < high) {
+       while(low < high && arr[high] >= pivotKey) high--;
+       arr[low] = arr[high];
+       while(low < high && arr[low] <= pivotKey) low++;
+       arr[high] = arr[low];
+     }
+     arr[low] = pivotKey;
+     return low;
+   }
+
+   function qSort(arr, low, high) {
+     if(low < high) {
+       var pivotPos = partition(arr, low, high);
+       qSort(arr, low, pivotPos - 1);
+       qSort(arr, pivotPos + 1, high);
+     }
+   }
+
+   function quickSort(arr) {
+     qSort(arr, 0, arr.length - 1);
+     return arr;
+   }
+   ```
+
 
 ## Javascript
 
