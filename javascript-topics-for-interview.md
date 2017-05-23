@@ -1,5 +1,3 @@
-[TOC]
-
 ## JavaScript 知识点
 
 ### 执行上下文
@@ -590,5 +588,297 @@ console.log(b.join(' ')); // "1 4 9"
 
 使用箭头函数时需要留意，箭头函数中的 `this` 是词法绑定的，其指向确定于函数定义的时候。这与一般的函数不同，它们的 `this` 是在调用时确定的。
 
-> 更确切的说法是：箭头没有自己的 `this` ，箭头函数中的 `this` 取决于外层上下文的 `this` 。
+> 更确切地说，箭头函数没有自己的 `this` ，箭头函数中的 `this` 取决于外层上下文的 `this` 。
 
+### 继承、原型和原型链
+
+JavaScript 不是基于类的语言（虽然 ES6 引入了 `class` ，但那只是语法糖），而是基于原型的语言。 JavaScript 只有一种继承结构，即对象。每个对象都有一个私有属性，指向该对象的原型。原型本身也是对象，也拥有自己的原型，所以这根链条一直延续下去，直到有一个对象以 `null` 作为其原型为止。根据定义， `null` 没有原型，其作为原型链的终点。
+
+JavaScript 中，几乎所有对象都是 `Object` 的实例，因而其位于原型链的顶层。
+
+#### 属性的继承
+
+JavaScript 中，对象是属性的动态容器。这里的属性指的是其自身拥有的属性。另一方面，对象拥有一条指向其原型的链接。尝试访问一个属性时，控制器会从对象自身开始，循原型链搜索，直至找到该属性或抵达原型链顶端为止。
+
+> 根据 ECMAScript 标准， `someObject.[[Prototype]]` 被用于制定 `someObject` 的原型。 ES6 规定，使用 `Object.getPrototypeOf()` 和 `Object.setPrototypeOf()` 实现对 `[[Prototype]]`  的访问。例如：
+>
+> ```javascript
+> var me = {
+>   name: 'Sean Zhou',
+>   age: 20,
+>   gender: 'Male'
+> };
+> Object.getPrototypeOf(me) === Object; // true
+>
+> var person = {
+>   role: 'Student'
+> };
+> Object.setPrototypeOf(me, person);
+> Object.getPrototypeOf(me) === person; // true
+> ```
+>
+> 许多浏览器还内置了 `__proto__` 属性，它并非标准，但作用等同于以上两个方法。
+>
+> 不要将以上内容和 `fn.prototype` 相混淆 - 函数的 `prototype` 属性用于设置当该函数用作构造函数创建对象时，其所创建的对象的原型。此外， `Object.prototype` 表示 `Object` 的原型对象。
+
+为一个对象增添属性，属性总是属于对象自身（不影响对象的原型）。唯一的例外是带有 `getter` 或 `setter` 的继承的属性。
+
+#### 方法的继承
+
+严格来讲， JavaScript 并不具备基于类的语言所拥有的方法（methods）。 JavaScript 中，任意函数都可以以属性的形式添加到一个对象上。
+
+若对象的一个方法是从它的原型那里继承得到的，则该方法内部 `this` 指向该对象本身，而非其原型。例如：
+
+```javascript
+var person = {
+  name: 'Name',
+  age: 'Age',
+  gender: 'Gender',
+  greet: function () {
+    console.log(`Hi! I'm ${this.name}.`);
+  }
+};
+
+// 以 person 为原型创建对象 me
+var me = Object.create(person);
+me.name = 'Sean Zhou';
+me.age = 20;
+me.gender = 'Male';
+
+me.greet(); // "Hi! I'm Sean Zhou."
+```
+
+#### 创建对象不同方法及对应的原型链
+
+**一般方法：**
+
+```javascript
+var me = {name: 'Sean Zhou'};
+// me 的原型为 Object.prototype ，继承了 Object.prototype 的属性和方法，
+// 如 hasOwnProperty 。 me 的原型链如下：
+// me --> Object.prototype --> null
+
+var fruits = ['apple', 'banana', 'strawberry'];
+// fruits 的原型为 Array.prototype，继承了 Array.prototype 的属性和方法，
+// 如 indexOf ， forEach ，等等。 fruits 的原型链如下：
+// fruits --> Array.prototype --> null
+
+function fn () {
+  // Do something
+}
+// fn() 的原型为 Function.prototype，继承了其 call ， bind 等属性和方法。
+// fn() 的原型链如下：
+// fn() --> Function.prototype --> Object.prototype --> null
+```
+
+**使用构造函数：**
+
+JavaScript 中，构造函数指必须用 `new` 来调用的函数。
+
+```javascript
+function Person(name, age, gender) {
+  this.name = name;
+  this.age = age;
+  this.gender = gender;
+}
+Person.prototype = {
+  greet: function () {
+    console.log(`Hi! I'm ${this.name}`);
+  }
+};
+
+var me = new Person('Sean Zhou', 20, 'Male');
+// me 自身具有三个属性，还继承了一个 greet 方法。
+```
+
+**使用 `Object.create()` ：**
+
+```javascript
+var person = {name: 'name'};
+// person --> Object.prototype --> null
+var me = Object.create(person);
+// me --> person --> Object.prototype --> null
+var anotherGuy = Object.create(null);
+// anotherGuy --> null
+anotherGuy.hasOwnProperty; // undefined ，因为 Object.prototype 不在其原型链上
+```
+
+**使用 `class` 关键字：**
+
+ES6 引入了一组新的关键字，用于实现类（class）。尽管它们看上去跟基于类的语言中的类一样，但它们并不相同， JavaScript 依旧是基于对象的语言。
+
+#### `instanceof` 操作符
+
+```javascript
+object instanceof constructor
+```
+
+该操作符检查 `object` 对象的原型链上是否存在 `constructor.prototype` 。例如：
+
+```javascript
+function Person(name) {
+  this.name = name;
+}
+var me = new Person('Sean Zhou');
+me instanceof Person; // true
+me instanceof Object; // true
+```
+
+#### 性能考量
+
+原型链的查找过程耗费时间，影响性能。尝试查找一个不存在的属性会将整条原型链遍历一次。
+
+此外，遍历一个对象的属性时，其原型链上的可枚举属性也会被访问到。
+
+若要检查对象某个属性是否存在，最好用 `hasOwnproperty` ，其只关心对象自身，不考虑原型链。
+
+**差劲的实践：扩展原生对象的原型**
+
+尝试对 `Object.prototype` 和其他原生对象原型进行扩展的操作，是一种差劲的实践。它会破坏原型链的密封性。
+
+### 函数组合与函数式编程
+
+函数组合（function composition）是将多个函数合并为一个新的函数的过程。例如， `f()` 和 `g()` 这两个函数可以组合为 `f(g(x))` 这个新函数，调用这个函数的运算过程是由里向外进行的，先计算 `x` ，然后计算 `g` ，最后计算 `f` 。
+
+让我们用一个例子来展现这个过程。想象你需要将用户的姓名转换为适用于 URL 的形式，为此，你需要完成下面几个步骤：
+
+1. 以空格为分割将姓、名拆分；
+2. 将大写字母全部转换成小写；
+3. 用连字符连接姓、名；
+4. 进行 URI 编码。
+
+一个简单的实现如下：
+
+```javascript
+const toSlug = name => encodeURIComponent(
+  name.split(' ').map(str => str.toLowerCase()).join('-')
+);
+```
+
+看起来不错，但是我们希望将其变得更易读。
+
+(To be continued...)
+
+函数式编程就是使用函数的组合来开发软件的过程，它避免了共享状态（shared state）、可变的数据（mutable data）和附加影响（side-effects）。函数式编程与面向对象编程相对立，面向对象编程中，物件（属性、方法）是可以共享的。
+
+### 事件冒泡与事件捕获
+
+事件冒泡和事件捕获是 HTML DOM 中事件传播的两种途径，它们决定了事件传播的顺序。当内层元素发生了一个事件，而内外层元素都有绑定那个事件的话，事件冒泡或捕获就会发生。
+
+在事件冒泡中，事件首先由最内层元素处理，然后一层层地向外传播。
+
+在事件捕获中，事件首先由最外层元素捕获并处理，然后一层层向内传播。
+
+互联网发展早期，网景浏览器提倡事件捕获，而微软的 IE 浏览器推崇事件冒泡。这两种处理方式后来都成了 W3C 标准。 IE8 及更老版本仅支持事件冒泡，其他现代浏览器均同时支持这两种方式。
+
+我们可以使用 `addEventListener(type, listener, useCapture)` 来决定使用哪种方式。若 `useCapture` 为真，则使用事件捕获。例如：
+
+```html
+<div class="demo">
+  <ul class="demo">
+    <li class="demo">Some text</li>
+  </ul>
+</div>
+```
+
+ ```javascript
+var e = document.getElementsByClassName('demo');
+for (item of e) {
+  item.addEventListener('click', showNode, true);
+}
+
+function showNode() {
+  alert(this.nodeName);
+}
+ ```
+
+执行以上代码，点击 “Some text” 时，首先会弹出 “div” ，然后是 “ul” ，最后是 “li” 。
+
+如果一个事件同时使用了捕获和冒泡这两种方式，则先发生事件捕获，后发生事件冒泡（与绑定的先后顺序无关）。可以理解成事件先被捕获进来，再冒泡出去。
+
+#### 停止事件传播
+
+我们可以使用 ` Event` 对象的 `stopPropagation()` 方法来中断事件的传播。我们修改上面例子中的代码：
+
+```javascript
+var e = document.getElementsByClassName('demo');
+e[0].addEventListener('click', showNode);
+e[1].addEventListener('click', stop);
+e[2].addEventListener('click', showNode);
+
+function showNode() {
+  alert(this.nodeName);
+}
+function stop(e) {
+  e.stopPropagation();
+  alert(`Stop on ${this.nodeName}`);
+}
+```
+
+我们也可以使用 `stopImmediatePropagation()` 方法，其不仅中断该事件的传播，也阻止其所在元素上，使用同一事件的其他任何侦听器的执行。
+
+### 类型转换
+
+在 JavaScript 中，我们可以手动进行数据的类型转换。某些情况下，控制器也会进行自动的类型转换。例如：
+
+```javascript
+var foo = 42;
+var bar = 42 + '';    // 自动转换
+var baz = String(42); // 手动转换
+```
+
+常用的手动数据类型转换方法有以下几种：
+
+**`toString()`**
+
+```javascript
+undefined.toString(); // "undefined"
+null.toString();      // "null"
+true.toString();      // "true"
+(42).toString();      // "42"
+[1, 2, 3].toString(); // "1,2,3"
+({}).toString();      // "[object Object]"
+```
+
+**`Number()`**
+
+```javascript
+Number(true);      // 1
+Number(false);     // 0
+Number(undefined); // NaN
+Number(null);      // 0
+Number('');        // 0
+Number([]);        // 0
+Number([42]);      // 42
+Number([1, 2, 3]); // NaN
+Number({});        // NaN
+
+var foo = {
+  valueOf: function() {
+    return '42';
+  }
+}
+var bar = {
+  toString: function() {
+    return '42';
+  }
+}
+var baz = [4,2];
+baz.toString = function() {
+  return this.join('');
+}
+Number(foo); // 42
+Number(bar); // 42
+Number(baz); // 42
+```
+
+**`Boolean()`**
+
+```javascript
+Boolean(null);      // false
+Boolean(undefined); // false
+Boolean(NaN);       // false
+Boolean('');        // false
+Boolean([]);        // true
+Boolean({});        // true
+```
