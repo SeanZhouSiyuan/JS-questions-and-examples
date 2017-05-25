@@ -29,6 +29,14 @@ var attr = document.createAttribute('class');
 var text = document.createTextNode('Hello World!');
 ```
 
+**克隆一个现有元素的方法如下：**
+
+```javascript
+var dupNode = node.cloneNode(deep);
+// deep she，表示同时克隆 node 的所有子节点，
+// 若设为 false ，则只克隆 node 自身
+```
+
 #### 元素操作
 
 **添加**
@@ -57,6 +65,28 @@ e.insertBefore(elem, referenceElem);
 e.replaceChild(elem, target);
 ```
 
+**查找**
+
+```javascript
+// 获取具有给定 id 的元素
+var elem = document.getElementById(idName);
+
+// 以 rootElement 为查找起点（不含自身），
+// 获取具有给定 class 的元素，返回一个 HTMLCollection
+var elems = rootElement.getElementsByClassName(className);
+
+// 以 rootElement 为查找起点（不含自身），
+// 获取匹配给定标签名的元素，返回一个 HTMLCollection
+var elems = rootElement.getElementsByTagName(tagName);
+
+// 获取与给定选择器（一个或一组）相匹配的第一个元素
+var elems = rootElement.querySelector(selectors);
+
+// 获取与给定选择器（一个或一组）相匹配的元素，
+// 返回一个静态的节点列表
+var elems = rootElement.querySelectorAll(selectors);
+```
+
 **修改**
 
 ```html
@@ -76,6 +106,7 @@ elem.innerText; // "Some text."
 > 另有 `node.textContent` ，它与 `node.innerText` 相似，但有以下不同：
 >
 > * `textContent` 可以获取 `<script>` 和 `<style>` 标签的内容， `innerText` 不可以；
+> * `textContent` 可以获取 `node` 中其他标签内的文本；
 > * `innerText` 不会返回样式设为隐藏的文本；
 > * 在 IE11 及以下版本的 IE 中，改变 `innerText` 的值将摧毁节点的所有子类文本节点。
 >
@@ -150,5 +181,173 @@ elem.removeAttribute('class');
 // 方法二（删除相应的属性节点，不常用）
 var removedAttr = elem.getAttributeNode('class');
 elem.removeAttributeNode(attrNode);
+```
+
+### 使用 DOM 更改样式 - CSSOM
+
+**语法：**
+
+```javascript
+// 方法一
+HTMLElement.style.property = value;
+
+// 方法二（将抹去现存的所有样式）
+HTMLElement.style = 'property: value';
+
+// 方法三（将抹去现存的所有样式）
+HTMLElement.setAttribute('style', 'property: value');
+```
+
+使用 DOM 设置的样式相当于内联样式，具有最高优先级。
+
+> 虽然以上语法也可以用于读取现有样式，但它们只能返回元素的内联样式（使用 style 属性设置的样式）。要获取某个元素拥有的全部样式，使用 `window.getComputedStyle()` ：
+>
+> ```javascript
+> var style = window.getComputedStyle(element);
+> ```
+>
+> 上面的代码获取作用于 `element` 的所有样式，返回一个动态的 `CSSStyleDeclaration` 对象。
+
+### DOM 导航
+
+根据 W3C 标准， HTML 文档中的任何事物都是节点。所有节点构成了一棵节点树。以下方法可以用于节点树的导航：
+
+```javascript
+// 以下方法均没有创建新的节点，
+// 而是获得了现存节点的引用
+
+// 获取当前节点的父亲节点
+var parentNode = node.parentNode;
+// 获取当前节点的父元素节点
+var parentElement = node.parentElement;
+
+// 获取当前节点的第一个子节点
+var childNode = node.firstChild;
+// 获取当前节点的第一个子元素节点
+var childElement = node.firstElementChild;
+// 获取当前节点的最后一个子节点
+var childNode = node.lastChild;
+// 获取当前节点的最后一个子元素节点
+var childElement = node.lastElementChild;
+// 获取当前节点的所有子节点
+var childNodes = node.childNodes;
+// 获取当前节点的所有子元素节点
+var childElements = node.children;
+
+// 获取当前节点的前一个兄弟节点
+var previousNode = node.previousSibling;
+// 获取当前节点的前一个兄弟元素节点
+var previousElement = node.previousElementSibling;
+// 获取当前节点的后一个兄弟节点
+var nextNode = node.nextSibling;
+// 获取当前节点的后一个兄弟元素节点
+var nextElement = node.nextElementSibling;
+
+// 获取当前节点的类型
+var nodeType = node.nodeType;
+// 获取当前节点的名称
+var nodeName = node.nodeName;
+// 获取当前节点的值，其中：
+// 元素节点返回 null
+// 属性节点返回属性的值
+// 文本节点返回文本内容
+var nodeValue = node.nodeValue;
+```
+
+### DOM 中的空白符
+
+HTML 文档中的空白符会给 DOM 操作带来麻烦。这些空白符会出现在 DOM 中，意味着：
+
+* 某些文本节点只含有空白符；
+* 某些文本节点的头尾两端有空白符。
+
+请看下面文档的 DOM 树表示：
+
+```html
+<!-- My document -->
+<html>
+<head>
+  <title>My Document</title>
+</head>
+<body>
+  <h1>Header</h1>
+  <p>
+    Paragraph
+  </p>
+</body>
+</html>
+```
+
+![img](https://mdn.mozillademos.org/files/854/whitespace_tree.png)
+
+对 DOM 进行遍历操作时，这些空白符也会被遍历到，造成不期望的结果。
+
+下面例举了一些有助于处理空白符的函数：
+
+```javascript
+// DOM 中的空白符可以是以下几种：
+// "\t" TAB 制表符
+// "\n" LF(Line Feed) 换行
+// "\r" CR(Carriage Return) 回车
+// " " SPC 空格
+
+// 1. 检查一个节点的文本内容是否只包含空白符
+function isAllWhitespace (node) {
+  // 是否可以找到除空白符之外的字符
+  return !(/[^\t\n\r]/.test(node.textContent));
+}
+// 参数 node 应为拥有 CharacterData 接口的节点，
+// 如文本，注释等
+
+// 2. 检查一个节点是否应该被遍历器忽视，
+// 如空白的文本节点，注释节点
+function isIgnorable (node) {
+  return (node.nodeType === 8) || // 注释节点
+         (node.nodeType === 3 && isAllWhitespace(node)); // 空白文本节点
+}
+
+// 3. 重写 previousSibling ，忽略空白文本及注释
+function nodeBefore (node) {
+  while (node) {
+    node = node.previousSibling;
+    if (!isAllWhitespace(node)) return node;
+  }
+  return null;
+}
+
+// 4. 重写 nextSibling ，忽略空白文本及注释
+function nodeAfter (node) {
+  while (node) {
+    node = node.nextSiling;
+    if(!isAllWhitespace(node)) return node;
+  }
+  return null;
+}
+
+// 5. 重写 lastChild ，忽略空白文本及注释
+function lastChild (node) {
+  node = node.lastChild;
+  while (node) {
+    if(!isAllWhitespace(node)) return node;
+    node = node.previousSibling;
+  }
+  return null;
+}
+
+// 6. 重写 firstChild ，忽略空白文本及注释
+function firstChild (node) {
+  node = node.firstChild;
+  while (node) {
+    if(!isAllWhitespace(node)) return node;
+    node = node.nextSibling;
+  }
+  return null;
+}
+
+// 7. 重写文本节点的 data 属性（用于获取文本内容），
+// 去除空白文本
+function dataOf (textNode) {
+  return data = textNode.data.trim();
+}
 ```
 
